@@ -35,13 +35,10 @@ async function ensureRecurringForCurrentMonth(userId, month, year) {
 
   for (const tpl of templates) {
     const exists = await Transaction.findOne({
-      user: userId,
-      $or: [
-      { _id: tpl._id }, // template itself
-      { recurringParent: tpl._id } // generated ones
-      ],
-      date: { $gte: start, $lte: end },
-    }).select('_id');
+  user: userId,
+  recurringParent: tpl._id,
+  date: { $gte: start, $lte: end },
+});
 
     if (exists) continue;
 
