@@ -206,4 +206,21 @@ router.get('/analytics/summary', async (req, res) => {
   }
 });
 
+// GET /api/transactions/analytics/overall
+router.get('/analytics/overall', async (req, res) => {
+  try {
+    const rows = await Transaction.aggregate([
+      { $match: { user: req.user._id } },
+      { $group: { _id: '$type', total: { $sum: '$amount' } } },
+    ]);
+
+    const totalIncome = rows.find(r => r._id === 'income')?.total || 0;
+    const totalExpense = rows.find(r => r._id === 'expense')?.total || 0;
+
+    res.json({ totalIncome, totalExpense, balance: totalIncome - totalExpense });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import api from '../utils/api';
 import { formatCurrency, CATEGORY_COLORS, CATEGORY_ICONS } from '../utils/helpers';
+import { getOverallAnalytics } from '../utils/transactions';
 import { useAuth } from '../context/AuthContext';
 import TransactionModal from '../components/TransactionModal';
 import Loader from '../components/Loader';
@@ -13,6 +14,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [summary, setSummary] = useState(null);
   const [prevSummary, setPrevSummary] = useState(null);
+  const [overall, setOverall] = useState(null);
   const [recentTxns, setRecentTxns] = useState([]);
   const [budget, setBudget] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,17 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchOverall = async () => {
+    try {
+      const res = await getOverallAnalytics();
+      setOverall(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => { fetchData(); }, [month, year]);
+  useEffect(() => { fetchOverall(); }, []);
 
   const pieData = summary ? Object.entries(summary.categoryBreakdown).map(([name, value]) => ({ name, value })) : [];
   const currency = user?.currency || '₹';
@@ -117,6 +129,31 @@ export default function DashboardPage() {
           <div className="stat-sub">
             {(summary?.balance || 0) >= 0 ? 'Savings trend ' : 'Trend '}
             {fmtPct(savingsMoM)} vs last month
+          </div>
+        </div>
+      </div>
+
+      {/* Overall Balance */}
+      <div className="card" style={{ marginBottom: 24 }}>
+        <div className="chart-title">Overall Balance</div>
+        <div className="budget-summary" style={{ marginBottom: 0 }}>
+          <div className="budget-stat">
+            <div className="budget-stat-amount" style={{ color: 'var(--green)' }}>
+              {formatCurrency(overall?.totalIncome || 0, currency)}
+            </div>
+            <div className="budget-stat-label">Total Income</div>
+          </div>
+          <div className="budget-stat">
+            <div className="budget-stat-amount" style={{ color: 'var(--red)' }}>
+              {formatCurrency(overall?.totalExpense || 0, currency)}
+            </div>
+            <div className="budget-stat-label">Total Expense</div>
+          </div>
+          <div className="budget-stat">
+            <div className="budget-stat-amount" style={{ color: 'var(--accent-light)' }}>
+              {formatCurrency(overall?.balance || 0, currency)}
+            </div>
+            <div className="budget-stat-label">Net Balance</div>
           </div>
         </div>
       </div>
@@ -192,7 +229,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {showModal && <TransactionModal onClose={() => setShowModal(false)} onSave={() => { fetchData(); setShowModal(false); }} />}
+      {showModal && <TransactionModal onClose={() => setShowModal(false)} onSave={() => { fetchData(); fetchOverall(); setShowModal(false); }} />}
     </div>
   );
 }
