@@ -22,7 +22,6 @@ async function ensureRecurringForCurrentMonth(userId, month, year) {
 
   const { start, end } = getMonthRange(year, month);
 
-  // "Templates" are recurring txns without a recurringParent
   const templates = await Transaction.find({
     user: userId,
     recurringMonthly: true,
@@ -34,15 +33,23 @@ async function ensureRecurringForCurrentMonth(userId, month, year) {
   const lastDay = new Date(year, month + 1, 0).getDate();
 
   for (const tpl of templates) {
+    //  EXISTING CHECK (keep)
     const exists = await Transaction.findOne({
-  user: userId,
-  recurringParent: tpl._id,
-  date: { $gte: start, $lte: end },
-});
+      user: userId,
+      recurringParent: tpl._id,
+      date: { $gte: start, $lte: end },
+    });
 
     if (exists) continue;
 
-    const day = Math.min(new Date(tpl.date).getDate(), lastDay);
+    //  NEW FIX (IMPORTANT)
+    const today = new Date().getDate();
+    const templateDay = new Date(tpl.date).getDate();
+
+    if (today < templateDay) continue;
+
+    // EXISTING LOGIC
+    const day = Math.min(templateDay, lastDay);
     const date = new Date(year, month, day, 12, 0, 0, 0);
 
     await Transaction.create({
