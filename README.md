@@ -2,9 +2,9 @@
 
 Portfolio-ready, full-stack finance dashboard to track transactions, budgets, and trends with a polished production UX.
 
-## Live Demo
+## 🚀 Live Demo
 
-`https://fin-flow-finance-dashboard-app.vercel.app/`
+👉 [Open FinFlow Dashboard](https://fin-flow-finance-dashboard-app.vercel.app/)
 
 **Author:** Ankitha Ramesh
 
