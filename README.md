@@ -2,23 +2,10 @@
 
 Portfolio-ready, full-stack finance dashboard to track transactions, budgets, and trends with a polished production UX.
 
-## 🚀 Live Demo
+![FinFlow Preview](client/public/screenshots/dashboard.png)
 
-👉 [Open FinFlow Dashboard](https://fin-flow-finance-dashboard-app.vercel.app/)
+🚀 **[Live Demo → Open FinFlow Dashboard](https://fin-flow-finance-dashboard-app.vercel.app/)**
 
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard](client/public/screenshots/dashboard.png)
-
-### Transactions
-![Transactions](client/public/screenshots/transactions.png)
-
-### Analytics
-![Analytics](client/public/screenshots/analytics.png)
-
-### Budget Limit
-![Budget Limit](client/public/screenshots/budgetlimit.png)
 
 **Author:** Ankitha Ramesh
 
@@ -104,6 +91,19 @@ finance-dashboard/
 ├── render.yaml
 └── package.json
 ```
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](client/public/screenshots/dashboard.png)
+
+### Transactions
+![Transactions](client/public/screenshots/transactions.png)
+
+### Analytics
+![Analytics](client/public/screenshots/analytics.png)
+
+### Budget Limit
+![Budget Limit](client/public/screenshots/budgetlimit.png)
 
 ## Installation
 
