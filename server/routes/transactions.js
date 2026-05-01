@@ -18,7 +18,10 @@ function isSameMonthYear(a, b) {
 async function ensureRecurringForCurrentMonth(userId, month, year) {
   const now = new Date();
   const target = new Date(year, month, 1);
-  if (!isSameMonthYear(now, target)) return;
+  // Only generate for current or past months (never future months)
+  const nowMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  if (target.getTime() > nowMonthStart.getTime()) return;
+  const isTargetCurrentMonth = isSameMonthYear(now, target);
 
   const { start, end } = getMonthRange(year, month);
 
@@ -33,6 +36,11 @@ async function ensureRecurringForCurrentMonth(userId, month, year) {
   const lastDay = new Date(year, month + 1, 0).getDate();
 
   for (const tpl of templates) {
+    // Don't generate a child in the same month as the template itself
+    if (isSameMonthYear(new Date(tpl.date), target)) continue;
+    // Don't backfill before the template's month
+    if (new Date(tpl.date).getTime() > end.getTime()) continue;
+
     //  EXISTING CHECK (keep)
     const exists = await Transaction.findOne({
       user: userId,
@@ -42,11 +50,12 @@ async function ensureRecurringForCurrentMonth(userId, month, year) {
 
     if (exists) continue;
 
-    //  NEW FIX (IMPORTANT)
-    const today = new Date().getDate();
     const templateDay = new Date(tpl.date).getDate();
-
-    if (today < templateDay) continue;
+    // For the current month only, don't generate future-dated occurrences.
+    if (isTargetCurrentMonth) {
+      const today = now.getDate();
+      if (today < templateDay) continue;
+    }
 
     // EXISTING LOGIC
     const day = Math.min(templateDay, lastDay);
